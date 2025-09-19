@@ -1,30 +1,23 @@
-name: Playwright Tests
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install dependencies
-        run: |
-          npm init -y
-          npm install @playwright/test
-
-      - name: Install browsers
-        run: npx playwright install --with-deps
-
-      - name: Run Playwright tests
-        run: npx playwright test
+export default defineConfig({
+  testDir: './tests',
+  timeout: 120000, // 2 mins per test
+  retries: 1,      // retry once in CI if it fails
+  use: {
+    headless: false,              // <-- turn off headless to see the browser in CI (debug only)
+    viewport: { width: 1280, height: 720 },
+    screenshot: 'only-on-failure', // capture screenshot if test fails
+    video: 'retain-on-failure',    // capture video if test fails
+    actionTimeout: 30000,          // max wait per action (fill, click)
+    navigationTimeout: 60000,      // max wait for page.goto
+  },
+  reporter: [['list'], ['html']],   // HTML report in addition to list
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
