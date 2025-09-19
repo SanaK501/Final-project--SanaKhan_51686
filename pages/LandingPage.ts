@@ -1,14 +1,22 @@
 // pages/LandingPage.ts
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 export class LandingPage {
-  constructor(private page: Page) {}
+  readonly page: Page;
 
-  async goto() {
-    await this.page.goto('https://ecommerce-playground.lambdatest.io/index.php?route=product/product&path=25&product_id=28');
+  constructor(page: Page) {
+    this.page = page;
   }
 
-  async assertPageTitle(expectedTitle: string) {
-    await expect(this.page).toHaveTitle(expectedTitle);
+  async goto() {
+    await this.page.goto(
+      'https://ecommerce-playground.lambdatest.io/index.php?route=product/product&path=57&product_id=49',
+      { waitUntil: 'domcontentloaded', timeout: 60000 }
+    );
+  }
+
+  async openReviewTab() {
+    await this.page.getByRole('link', { name: 'Reviews (0)' }).click();
+    await this.page.waitForSelector('#form-review', { timeout: 30000 });
   }
 }
